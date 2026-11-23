@@ -1,0 +1,355 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/sametexe001/sametlibs/refs/heads/main/nhack/Library.lua"))()
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local Window = Library:Window({
+    Title = "Superiority"
+})
+
+local Watermark = Library:Watermark({
+    Name = "Superiority"
+})
+
+Watermark:SetDynamicTextProvider(function(Fps)
+    return string.format("Superiority | %dfps | %s", Fps, os.date("%X"))
+end)
+
+local KeybindList = Library:KeybindList({
+    Name = "Keybinds"
+})
+
+local TargetIndicator = Library:TargetIndicator()
+local ChargeShot = Library:ChargeShotWidget({
+    Name = "Charge Shot"
+})
+
+pcall(function()
+    TargetIndicator:SetTarget(LocalPlayer)
+end)
+
+ChargeShot:SetRange(1, 30)
+ChargeShot:SetValue(18)
+ChargeShot:SetFillColor(Library.Theme["Accent"])
+
+Library:RegisterSettingsWidget({
+    Name = "Watermark",
+    Default = true,
+    Callback = function(Value)
+        Watermark:SetVisibility(Value)
+    end
+})
+
+Library:RegisterSettingsWidget({
+    Name = "Keybind List",
+    Default = true,
+    Callback = function(Value)
+        KeybindList:SetVisibility(Value)
+    end
+})
+
+Library:RegisterSettingsWidget({
+    Name = "Target Indicator",
+    Default = false,
+    Callback = function(Value)
+        TargetIndicator:SetVisibility(Value)
+    end
+})
+
+Library:RegisterSettingsWidget({
+    Name = "Charge Shot",
+    Default = false,
+    Callback = function(Value)
+        ChargeShot:SetVisibility(Value)
+    end
+})
+
+local Main = Window:Page({ Name = "Main" })
+local Combat = Main:SubPage({ Name = "Combat" })
+local AimbotSection = Combat:Section({ Name = "Aimbot", Side = 1 })
+local VisualsSection = Combat:Section({ Name = "Visuals", Side = 2 })
+
+local AimbotToggle = AimbotSection:Toggle({
+    Name = "Enable Aimbot",
+    Flag = "AimbotEnabled",
+    Default = true,
+    Tooltip = "Toggle the aimbot module.",
+    Callback = function(Value)
+    end
+})
+
+AimbotToggle:Colorpicker({
+    Name = "Aimbot Color",
+    Flag = "AimbotColor",
+    Default = Color3.fromRGB(255, 143, 40),
+    Alpha = 1,
+    Transparency = false,
+    Callback = function(Color, Alpha)
+    end
+})
+
+AimbotToggle:Keybind({
+    Name = "Aimbot Key",
+    Flag = "AimbotKey",
+    Default = Enum.KeyCode.Q,
+    Mode = "Hold",
+    Callback = function(Toggled)
+    end
+})
+
+AimbotSection:Slider({
+    Name = "FOV",
+    Flag = "AimbotFOV",
+    Default = 90,
+    Min = 1,
+    Max = 360,
+    Decimals = 0,
+    Suffix = "",
+    Callback = function(Value)
+    end
+})
+
+AimbotSection:Dropdown({
+    Name = "Hit Part",
+    Flag = "AimbotPart",
+    Items = { "Head", "Torso", "Nearest" },
+    Default = "Head",
+    Callback = function(Value)
+    end
+})
+
+local ESPToggle = VisualsSection:Toggle({
+    Name = "ESP",
+    Flag = "ESPEnabled",
+    Default = true,
+    Tooltip = "Draws players through walls.",
+    Callback = function(Value)
+    end
+})
+
+ESPToggle:Colorpicker({
+    Name = "ESP Color",
+    Flag = "ESPColor",
+    Default = Color3.fromRGB(255, 143, 40),
+    Alpha = 0.65,
+    Transparency = true,
+    Callback = function(Color, Alpha)
+    end
+})
+
+ESPToggle:Keybind({
+    Name = "ESP Key",
+    Flag = "ESPKey",
+    Default = Enum.KeyCode.E,
+    Mode = "Toggle",
+    Callback = function(Toggled)
+    end
+})
+
+VisualsSection:Slider({
+    Name = "Max Distance",
+    Flag = "ESPDistance",
+    Default = 500,
+    Min = 50,
+    Max = 2000,
+    Decimals = 0,
+    Callback = function(Value)
+    end
+})
+
+VisualsSection:Dropdown({
+    Name = "Box Style",
+    Flag = "ESPBoxStyle",
+    Items = { "Full", "Corner", "Filled" },
+    Default = "Corner",
+    Callback = function(Value)
+    end
+})
+
+local Showcase = Window:Page({ Name = "Showcase" })
+local Everything = Showcase:SubPage({ Name = "Everything" })
+local Widgets = Everything:Section({ Name = "Standalone Widgets", Side = 1 })
+local Combinations = Everything:Section({ Name = "Combinations", Side = 2 })
+
+local Status = Widgets:Label({
+    Name = "Status | ready",
+    Tooltip = "This label updates from the widgets below."
+})
+
+Widgets:Toggle({
+    Name = "Master Toggle",
+    Flag = "ShowcaseToggle",
+    Default = true,
+    Callback = function(Value)
+        Status:SetText("Status | master " .. (Value and "enabled" or "disabled"))
+    end
+})
+
+Widgets:Slider({
+    Name = "Walk Speed",
+    Flag = "ShowcaseSpeed",
+    Default = 32,
+    Min = 8,
+    Max = 120,
+    Decimals = 0,
+    Callback = function(Value)
+        Status:SetText("Status | speed " .. tostring(Value))
+    end
+})
+
+Widgets:Dropdown({
+    Name = "Target Part",
+    Flag = "ShowcasePart",
+    Items = { "Head", "Chest", "Legs" },
+    Default = "Head",
+    Callback = function(Value)
+        Status:SetText("Status | target " .. tostring(Value))
+    end
+})
+
+Widgets:Dropdown({
+    Name = "ESP Layers",
+    Flag = "ShowcaseLayers",
+    Multi = true,
+    Items = { "Box", "Health", "Name", "Distance", "Tracer" },
+    Default = { "Box", "Health" },
+    Callback = function(Value)
+        local Text = #Value > 0 and table.concat(Value, ", ") or "none"
+        Status:SetText("Status | layers " .. Text)
+    end
+})
+
+Widgets:Textbox({
+    Name = "Player Filter",
+    Flag = "ShowcaseFilter",
+    Placeholder = "type a name...",
+    Callback = function(Value)
+        Status:SetText("Status | filter " .. (Value ~= "" and Value or "empty"))
+    end
+})
+
+Widgets:Button({
+    Name = "Send Notification",
+    Callback = function()
+        Library:Notification("Hello from the showcase!", 3, Library.Theme["Accent"])
+    end
+})
+
+Widgets:Button({
+    Name = "Open Confirm Dialog",
+    Callback = function()
+        Library:OpenConfirmDialog({
+            Title = "Showcase confirmation",
+            Message = "This is a live preview of the confirm dialog. Continue?",
+            ConfirmText = "Continue",
+            CancelText = "Cancel",
+            AccentColor = Library.Theme["Risky"],
+            Callback = function(Confirmed)
+                Library:Notification(
+                    Confirmed and "Confirmed." or "Cancelled.",
+                    3,
+                    Confirmed and Library.Theme["Accent"] or Library.Theme["Risky"]
+                )
+            end
+        })
+    end
+})
+
+Widgets:Toggle({
+    Name = "Risky Option",
+    Flag = "ShowcaseRisky",
+    Risky = true,
+    Default = false,
+    Callback = function(Value)
+        Status:SetText("Status | risky " .. (Value and "on" or "off"))
+    end
+})
+
+local AccentLabel = Combinations:Label({
+    Name = "Accent",
+    Tooltip = "Label + colorpicker + keybind."
+})
+
+AccentLabel:Colorpicker({
+    Flag = "ShowcaseAccent",
+    Default = Color3.fromRGB(255, 143, 40),
+    Alpha = 1,
+    Transparency = true,
+    Callback = function(Color, Alpha)
+        Status:SetText(("Status | #%s at %d%%"):format(Color:ToHex(), math.floor(Alpha * 100 + 0.5)))
+    end
+})
+
+AccentLabel:Keybind({
+    Flag = "ShowcaseAccentKey",
+    Default = Enum.KeyCode.F,
+    Mode = "Toggle"
+})
+
+local HighlightToggle = Combinations:Toggle({
+    Name = "Highlight",
+    Flag = "ShowcaseHighlight",
+    Default = true,
+    Callback = function(Value)
+        Status:SetText("Status | highlight " .. (Value and "on" or "off"))
+    end
+})
+
+HighlightToggle:Colorpicker({
+    Flag = "ShowcaseHighlightColor",
+    Default = Color3.fromRGB(0, 200, 255),
+    Alpha = 0.8,
+    Transparency = true,
+    Callback = function(Color, Alpha)
+        Status:SetText(("Status | highlight #%s at %d%%"):format(Color:ToHex(), math.floor(Alpha * 100 + 0.5)))
+    end
+})
+
+HighlightToggle:Keybind({
+    Flag = "ShowcaseHighlightKey",
+    Default = Enum.KeyCode.H,
+    Mode = "Toggle"
+})
+
+local ColorOnly = Combinations:Label({ Name = "Color Only" })
+
+ColorOnly:Colorpicker({
+    Flag = "ShowcaseColorOnly",
+    Default = Color3.fromRGB(80, 255, 140),
+    Alpha = 1,
+    Transparency = false,
+    Callback = function(Color, Alpha)
+        Status:SetText(("Status | color #%s at %d%%"):format(Color:ToHex(), math.floor(Alpha * 100 + 0.5)))
+    end
+})
+
+local QuickBind = Combinations:Label({ Name = "Quick Bind" })
+
+QuickBind:Keybind({
+    Flag = "ShowcaseQuickBind",
+    Default = Enum.KeyCode.R,
+    Mode = "Toggle"
+})
+
+Combinations:Searchbox({
+    Name = "Search",
+    Flag = "ShowcaseSearch",
+    Items = {
+        "Aimbot",
+        "ESP",
+        "Silent Aim",
+        "Orbit",
+        "Fly",
+        "Speed",
+        "No Clip",
+        "Fullbright",
+        "Auto Parry"
+    },
+    Callback = function(Value)
+        Status:SetText("Status | search " .. tostring(Value))
+    end
+})
+
+Library:Notification("Showcase loaded", 3, Library.Theme["Accent"])
+
+Window:CreateSettingsPage()
